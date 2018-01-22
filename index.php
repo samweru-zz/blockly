@@ -7,7 +7,7 @@ require("bootstrap.php");
 
 $chain = new Chain();
 
-$sam = sha1("pitsolu");
+$sam = sha1("sam-weru");
 $dan = sha1("daniel-bedingfield");
 $taxman = sha1("revenue-service");
 
