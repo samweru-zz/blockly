@@ -35,8 +35,6 @@ class PoW{
 				break;
 
 			$nonce++;
-
-			$this->block->setNonce($nonce);
 		}
 
 		$end_time = $this->getStopWatch();

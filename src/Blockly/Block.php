@@ -72,7 +72,7 @@ class Block{
 			"index"=>$this->index,
 			"difficulty"=>$this->difficulty,
 			"timestamp"=>$this->timestamp,
-			"data"=>$this->data->getArr(),
+			"transactions"=>$this->data->getArr(),
 			"merkle-root"=>@key($this->data->getMerkleTree()),
 			"prev_hash"=>$this->prev_hash,
 			"nonce"=>$this->nonce,
