@@ -1,7 +1,6 @@
 <?php
 
 use Blockly\{Trx, Block, Data, Chain, PoW};
-use Crypt\Common\Sha;
 
 require("bootstrap.php");
 
