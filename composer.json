@@ -1,5 +1,15 @@
 {
+	"name": "samweru/blockly",
+    "description": "Simple Blockchain",
+    "license": "MIT",
+    "authors": [
+        
+        {
+            "name": "Sam Weru"
+        }
+    ],
     "require": {
+    	"php": ">=7.0",
         "doctrine/cache": "^1.6",
         "pitsolu/merkle-tree": "dev-master",
         "pitsolu/crypt": "dev-master"
