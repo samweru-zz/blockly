@@ -19,8 +19,6 @@ $data->addTrx($fee);
 $data->addTrx($tax);
 
 $last_block = $chain->getLatestBlock();
-$difficulty = $last_block->getDifficulty();
-$nonce = $last_block->getNonce();
 
 $block = new Block($data, $last_block);
 
