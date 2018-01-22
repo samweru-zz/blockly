@@ -73,6 +73,7 @@ class Block{
 			"difficulty"=>$this->difficulty,
 			"timestamp"=>$this->timestamp,
 			"data"=>$this->data->getArr(),
+			"merkle-root"=>@key($this->data->getMerkleTree()),
 			"prev_hash"=>$this->prev_hash,
 			"nonce"=>$this->nonce,
 			"hash"=>$this->hash

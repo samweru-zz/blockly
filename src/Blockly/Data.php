@@ -7,6 +7,7 @@ class Data{
 	private $proof;
 	private $trxs;
 	private $tree;
+	private $merkleTree;
 
 	public function __construct(){
 
@@ -16,14 +17,14 @@ class Data{
 		};
 
 		$this->trxs = [];
-		$this->tree = new \Merkle\Tree($hash);
+		$this->merkleTree = new \Merkle\Tree($hash);
 	}
 
 	public function addTrx(Trx $trx){
 
 		$this->trxs[] = $trx;
 
-		$this->tree->add(new \Merkle\Leaf($trx->getArr()));
+		$this->tree = $this->merkleTree->add(new \Merkle\Leaf($trx->getArr()));
 	}
 
 	public function getMerkleTree(){
