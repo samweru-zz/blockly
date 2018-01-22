@@ -1,0 +1,6 @@
+..gitignore.swp
+.composer.json.swp
+php_errors.log
+test*.php
+composer.lock
+vendor/

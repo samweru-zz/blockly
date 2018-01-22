@@ -1,0 +1,7 @@
+{
+    "require": {
+        "doctrine/cache": "^1.6",
+        "pitsolu/merkle-tree": "dev-master",
+        "pitsolu/crypt": "dev-master"
+    }
+}
