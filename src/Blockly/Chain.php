@@ -63,7 +63,12 @@ class Chain{
 
 		foreach($data as $key=>$val){
 
-			if(in_array($key, array("index", "timestamp", "prev_hash", "difficulty", "nonce"))){
+			if(in_array($key, array("index", 
+									"timestamp", 
+									"prev_hash", 
+									"difficulty", 
+									"nonce", 
+									"hash"))){
 
 				$property = $refl->getProperty($key);
 				if($property->isPrivate())
@@ -75,6 +80,18 @@ class Chain{
 		}
 
 		$this->blocks[] = $block;
+	}
+
+	public function mineBlocks(){
+
+		foreach($this->blocks as $key=>$block){
+
+			if(empty($block->getHash())){
+
+				$pow = new PoW($block);
+				$pow->run();
+			}
+		}
 	}
 
 	public function __toString(){

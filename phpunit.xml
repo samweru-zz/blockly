@@ -1,0 +1,7 @@
+<phpunit bootstrap="bootstrap.php" backupGlobals="false">
+  <testsuites>
+    <testsuite name="Blockly">
+      <directory>./tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>

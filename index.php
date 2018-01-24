@@ -70,7 +70,7 @@ $r->post("/add/trx", function(RequestInterface $req) use ($cache, $chain){
     $data = new Data();
     $data->addTrx(new Trx(sha1($sender), 
                             sha1($recipient), 
-                            sha1($amount)));
+                            $amount));
 
     $block = new Block($data, $chain->getLastBlock());
 
@@ -79,6 +79,19 @@ $r->post("/add/trx", function(RequestInterface $req) use ($cache, $chain){
     $cache->save("chain", $chain->getArr(), 21600);
 
     return "Transaction saved successfully!";
+});
+
+$r->get("/mine", function() use ($cache, $chain){
+
+    // print_r($chain);exit;
+
+    $chain->mineBlocks();
+
+    // $cache->delete("chain");
+
+    $cache->save("chain", $chain->getArr(), 21600);
+
+    return "Mining successful.";
 });
 
 $r->get("/chain", function() use ($chain){

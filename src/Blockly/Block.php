@@ -10,6 +10,7 @@ class Block{
     private $prev_hash;
     private $difficulty;
     private $nonce;
+    private $hash;
 
 	public function __construct(Data $data, 
 								Block $last_block = null, 
