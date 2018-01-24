@@ -8,8 +8,13 @@ class Block{
     private $timestamp;
     private $data;
     private $prev_hash;
+    private $difficulty;
+    private $nonce;
 
-	public function __construct(Data $data, Block $last_block = null, int $difficulty = 3, int $nonce = 1){
+	public function __construct(Data $data, 
+								Block $last_block = null, 
+								int $difficulty = 3, 
+								int $nonce = 1){
 
 		$this->difficulty = $difficulty;
 		$this->nonce = $nonce;

@@ -9,15 +9,20 @@ class Data{
 	private $tree;
 	private $merkleTree;
 
-	public function __construct(){
+	public function __construct(Array $trxs = null){
 
 		$hash = function($data){
 
 			return \Crypt\Common\Sha::dbl256($data);
 		};
 
-		$this->trxs = [];
 		$this->merkleTree = new \Merkle\Tree($hash);
+
+		$this->trxs = [];
+
+		if(!is_null($trxs))
+			foreach($trxs as $trx)
+				$this->addTrx(new Trx($trx["from"], $trx["to"], $trx["amount"]));
 	}
 
 	public function addTrx(Trx $trx){

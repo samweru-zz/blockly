@@ -1,36 +1,89 @@
 <?php
 
-use Blockly\{Trx, Block, Data, Chain, PoW};
+//index.php
+use Blockly\{Block, Chain, Trx, Data, PoW};
+use Psr\Http\Message\{RequestInterface, ResponseInterface};
 
-require("bootstrap.php");
+require "bootstrap.php";
+
+$cache = new \Doctrine\Common\Cache\ApcuCache();
 
 $chain = new Chain();
 
-$sam = sha1("sam-weru");
-$dan = sha1("daniel-bedingfield");
-$taxman = sha1("revenue-service");
+if($cache->contains("chain")){
 
-$fee = new Trx($sam, $dan, 100);
-$tax = new Trx($sam, $taxman, 10);
-
-$data = new Data();
-$data->addTrx($fee);
-$data->addTrx($tax);
-
-$last_block = $chain->getLatestBlock();
-
-$block = new Block($data, $last_block);
-
-$chain->addBlock($block);
-
-//mining
-foreach($chain->getBlocks() as $block){
-
-	if(empty($block->getHash())){
-
-		$pow = new PoW($block);
-		$pow->run();
-	}
+    $blocks = $cache->fetch("chain");
+    array_shift($blocks);
+    foreach($blocks as $block_data)
+        $chain->createBlock($block_data);
 }
 
-print_r((string)$chain);
+$allowed = []; //array("user_del");
+
+$r = new Strukt\Router\Router($servReq, $allowed);
+
+$r->before(function(RequestInterface $req, ResponseInterface $res){
+
+    // $path = $req->getUri()->getPath();
+    //
+});
+
+$r->get("/", function(){
+
+    return "Blockly chain.";
+});
+
+$r->get("/register/nodes", function(RequestInterface $req) use ($cache){
+
+    $body = $req->getParsedBody();
+    if(is_array($body))
+        $_nodes = $body["nodes"];
+
+    if(empty($_nodes))
+        return "Found no nodes in request!";
+
+    $nodes = [];
+    if($cache->contains("nodes"))
+        $nodes = $cache->fetch("nodes");
+
+    $nodes = array_merge($nodes, $_nodes);
+
+    $cache->save("nodes", $nodes, 21600);
+
+    return "Nodes successfully saved";
+});
+
+$r->get("/nodes", function() use ($cache){
+
+    if(!$cache->contains("nodes"))
+        return "There are no nodes!";
+
+    return json_encode($cache->fetch("nodes"));
+});
+
+$r->post("/add/trx", function(RequestInterface $req) use ($cache, $chain){
+
+    $body = $req->getParsedBody();
+
+    extract($body);
+
+    $data = new Data();
+    $data->addTrx(new Trx(sha1($sender), 
+                            sha1($recipient), 
+                            sha1($amount)));
+
+    $block = new Block($data, $chain->getLastBlock());
+
+    $chain->addBlock($block);
+
+    $cache->save("chain", $chain->getArr(), 21600);
+
+    return "Transaction saved successfully!";
+});
+
+$r->get("/chain", function() use ($chain){
+
+    return (string)$chain;
+});
+
+$r->run();

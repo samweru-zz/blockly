@@ -12,6 +12,9 @@
     	"php": ">=7.0",
         "doctrine/cache": "^1.6",
         "pitsolu/merkle-tree": "dev-master",
-        "pitsolu/crypt": "dev-master"
-    }
+        "pitsolu/crypt": "dev-master",
+		"strukt/router": "dev-master",
+        "ext-apcu":"*"
+    },
+    "minimum-stability":"dev"
 }
