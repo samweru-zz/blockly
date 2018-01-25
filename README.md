@@ -56,13 +56,13 @@ http GET localhost:8081/register/nodes <<<"{'nodes':['localhost:8080','localhost
 http GET localhost:8081/nodes
 ```
 
-7) View chain on node `8080` first then do concensus
+7) View chain on node `8081` first then do concensus
 
 ```
 http GET localhost:8081/concensus
 ```
 
-8) View chain on node `8081`
+8) View chain on node `8081` again.
 
 
 
