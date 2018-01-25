@@ -10,13 +10,10 @@ require "bootstrap.php";
 $cache = new \Doctrine\Common\Cache\ApcuCache();
 
 $chain = new Chain();
-
 if($cache->contains("chain")){
 
-    $blocks = $cache->fetch("chain");
-    array_shift($blocks);
-    foreach($blocks as $block_data)
-        $chain->createBlock($block_data);
+    $chainArr = $cache->fetch("chain");
+    $chain = new Chain($chainArr);
 }
 
 $allowed = []; //array("user_del");
@@ -128,10 +125,7 @@ $r->get("/concensus", function(RequestInterface $req) use ($cache, $chain){
 
         $notOurBlocksArr = json_decode($body, 1);
 
-        $notOurChain = new Chain();
-        array_shift($notOurBlocksArr);
-        foreach($notOurBlocksArr as $notOurBlock)
-            $notOurChain->createBlock($notOurBlock);
+        $notOurChain = new Chain($notOurBlocksArr);
 
         $notOurBlocks = $notOurChain->getBlocks();
         $ourBlocks = $chain->getBlocks();
