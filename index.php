@@ -93,7 +93,7 @@ $r->get("/mine", function() use ($cache, $chain){
     return "Mining successful.";
 });
 
-$r->get("/concensus", function(RequestInterface $req) use ($cache, $chain){
+$r->get("/consensus", function(RequestInterface $req) use ($cache, $chain){
 
     $servParam = $req->getServerParams();
 
