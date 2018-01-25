@@ -5,7 +5,7 @@ This is just a simple blockchain with basic functionality.
 
 ## Installation
 
-Ensure you have php7 apcu cache installed.
+Ensure you have `php7` and `php-apcu` extesntion for cache installed.
 
 ```
 git clone https://github.com/samweru/blockly
