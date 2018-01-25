@@ -1,7 +1,7 @@
 Blockly
 =======
 
-This is just a prototype of a blockchain with simple functionality.
+This is just a simple blockchain with basic functionality.
 
 ## Installation
 
@@ -9,6 +9,7 @@ Ensure you have php7 apcu cache installed.
 
 ```
 git clone https://github.com/samweru/blockly
+cd blockly
 composer update
 ```
 
