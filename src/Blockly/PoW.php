@@ -20,16 +20,15 @@ class PoW{
 
 	public static function validate(Block $block, $prev_nonce){
 
-		$block_data = $block->getArr();
-		$block_data["hash"] = "";
-		$block_data["nonce"] = $prev_nonce;
+		$blockArr = $block->getArr();
+		unset($blockArr["hash"]);
+		unset($blockArr["transactions"]);
+		$blockArr["nonce"] = $prev_nonce;
 
-		$subject = json_encode($block_data);
+		$subject = json_encode($blockArr);//block header
 
 		$nonce = $block->getNonce();
 		$hash = $block->getHash();
-
-		// print_r(array(\Crypt\Common\Sha::dbl256(sprintf("%s%s", $subject, $nonce)), $hash));
 
 		return \Crypt\Common\Sha::dbl256(sprintf("%s%s", $subject, $nonce)) == $hash; 
 	}
@@ -38,7 +37,12 @@ class PoW{
 
 		$difficulty = $this->block->getDifficulty();
 		$nonce = $this->block->getNonce();
-		$subject = json_encode($this->block->getArr());
+
+		$blockArr = $this->block->getArr();
+		unset($blockArr["transactions"]);
+		unset($blockArr["hash"]);
+
+		$subject = json_encode($blockArr);//block header
 
 		$start_time = $this->getStopWatch();
 
