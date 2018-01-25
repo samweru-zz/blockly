@@ -21,7 +21,7 @@ pip install httpie
 
 ## Getting Started
 
-1) Run nodes in separate terminal as ports in php in-built server `8080`,`8081`,`8082`
+1) Run nodes in separate terminals as ports in php in-built server `8080`,`8081`,`8082`
 
 ```
 php -S localhost:{port} index.php
