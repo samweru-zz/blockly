@@ -18,16 +18,31 @@ class PoW{
 	    return ((float)$usec + (float)$sec);
 	}
 
+	public static function validate(Block $block, $prev_nonce){
+
+		$block_data = $block->getArr();
+		$block_data["hash"] = "";
+		$block_data["nonce"] = $prev_nonce;
+
+		$subject = json_encode($block_data);
+
+		$nonce = $block->getNonce();
+		$hash = $block->getHash();
+
+		// print_r(array(\Crypt\Common\Sha::dbl256(sprintf("%s%s", $subject, $nonce)), $hash));
+
+		return \Crypt\Common\Sha::dbl256(sprintf("%s%s", $subject, $nonce)) == $hash; 
+	}
+
 	public function run(){
 
 		$difficulty = $this->block->getDifficulty();
 		$nonce = $this->block->getNonce();
+		$subject = json_encode($this->block->getArr());
 
 		$start_time = $this->getStopWatch();
 
 		while(true){
-
-			$subject = json_encode($this->block->getArr());
 
 			$hash = \Crypt\Common\Sha::dbl256(sprintf("%s%s", $subject, $nonce));
 

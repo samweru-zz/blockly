@@ -3,6 +3,7 @@
 //index.php
 use Blockly\{Block, Chain, Trx, Data, PoW};
 use Psr\Http\Message\{RequestInterface, ResponseInterface};
+use Zend\Http\Client;
 
 require "bootstrap.php";
 
@@ -35,9 +36,11 @@ $r->get("/", function(){
 
 $r->get("/register/nodes", function(RequestInterface $req) use ($cache){
 
+    $_nodes = [];
     $body = $req->getParsedBody();
     if(is_array($body))
-        $_nodes = $body["nodes"];
+        if(!empty($body))
+            $_nodes = $body["nodes"];
 
     if(empty($_nodes))
         return "Found no nodes in request!";
@@ -46,7 +49,10 @@ $r->get("/register/nodes", function(RequestInterface $req) use ($cache){
     if($cache->contains("nodes"))
         $nodes = $cache->fetch("nodes");
 
-    $nodes = array_merge($nodes, $_nodes);
+    if(!empty($nodes))
+        $nodes = array_diff($nodes, $_nodes);
+
+    $nodes = array_merge($_nodes, $nodes);
 
     $cache->save("nodes", $nodes, 21600);
 
@@ -83,15 +89,79 @@ $r->post("/add/trx", function(RequestInterface $req) use ($cache, $chain){
 
 $r->get("/mine", function() use ($cache, $chain){
 
-    // print_r($chain);exit;
-
     $chain->mineBlocks();
-
-    // $cache->delete("chain");
 
     $cache->save("chain", $chain->getArr(), 21600);
 
     return "Mining successful.";
+});
+
+$r->get("/concensus", function(RequestInterface $req) use ($cache, $chain){
+
+    $servParam = $req->getServerParams();
+
+    $message = "Our chain rules them all!";
+
+    $nodes = $cache->fetch("nodes");
+    if(empty($nodes))
+        return "There no nodes available!";
+
+    $ourBlocks = $chain->getBlocks();
+
+    foreach($nodes as $node){
+
+        if($node == $servParam["HTTP_HOST"])
+            continue;
+
+        $client = new Client();
+        $client->setUri(sprintf('http://%s/chain', $node));
+        $client->setMethod('GET');
+        $client->setOptions(array(
+
+            'maxredirects' => 0,
+            'timeout' => 1200
+        ));
+        
+        $response = $client->send();
+
+        $body = $response->getBody();
+
+        $notOurBlocksArr = json_decode($body, 1);
+
+        $notOurChain = new Chain();
+        array_shift($notOurBlocksArr);
+        foreach($notOurBlocksArr as $notOurBlock)
+            $notOurChain->createBlock($notOurBlock);
+
+        $notOurBlocks = $notOurChain->getBlocks();
+        $ourBlocks = $chain->getBlocks();
+
+        $isProofOfWorkValid = true;
+        $isOtherChainGreater = false;
+
+        if(count($notOurBlocks) > count($ourBlocks)){
+
+            $isOtherChainGreater = true;
+
+            $prevBlock = array_shift($notOurBlocks);
+
+            foreach($notOurBlocks as $block){
+
+                if(!PoW::validate($block, $prevBlock->getNonce())){
+                    
+                    $isProofOfWorkValid = false;
+                }
+            }
+        }
+
+        if($isProofOfWorkValid && $isOtherChainGreater){
+
+            $cache->save("chain", $notOurChain->getArr());
+            $message = "Our chain has been replaced!";
+        }
+    }
+
+    return $message;
 });
 
 $r->get("/chain", function() use ($chain){

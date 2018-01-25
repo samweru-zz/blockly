@@ -14,18 +14,18 @@ class Chain{
 
 		$this->blocks[] = $prevBlock;
 
-		if(!is_null($chain)){
+		// if(!is_null($chain)){
 
-			foreach($chain as $_block){
+		// 	foreach($chain as $_block){
 
-				$prevBlock = new Block(new Data($block["transactions"]), 
-										$prevBlock, 
-										$_block["difficulty"],
-										$_block["nonce"]);
+		// 		$prevBlock = new Block(new Data($block["transactions"]), 
+		// 								$prevBlock, 
+		// 								$_block["difficulty"],
+		// 								$_block["nonce"]);
 
-				$this->blocks[] = $prevBlock;
-			}
-		}
+		// 		$this->blocks[] = $prevBlock;
+		// 	}
+		// }
 	}
 
 	public function addBlock(Block $block){

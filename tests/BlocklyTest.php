@@ -33,16 +33,25 @@ class BlocklyTest extends PHPUnit_Framework_TestCase{
 		 
 		//mining
 		foreach($this->chain->getBlocks() as $block){
-		 
+
+		 	$other_blocks[] = $block;
+
 		 	if(empty($block->getHash())){
+
+		 		$prevBlock = current($other_blocks);
 		 
 		 		$pow = new PoW($block);
 		 		$blocks[] = $pow->run();
+
+		 		$last_nonce = $prevBlock->getNonce();
+
+		 		break;
 		 	}
 		}
 
 		$block = reset($blocks);
 		$this->assertTrue(count($blocks) == 1);
 		$this->assertTrue(!empty($block->getHash()));
+		$this->assertTrue(PoW::validate($block, $last_nonce));
 	}
 }
