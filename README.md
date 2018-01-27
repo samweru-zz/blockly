@@ -13,7 +13,7 @@ cd blockly
 composer update
 ```
 
-(Optional) Install python httpie which is a commandline http client.
+Install python httpie which is a commandline http client.
 
 ```
 pip install httpie
