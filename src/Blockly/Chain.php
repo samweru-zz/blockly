@@ -25,6 +25,16 @@ class Chain{
 		}
 	}
 
+	public static function newMerkleTree(){
+
+		$hash = function($data){
+
+			return \Crypt\Common\Sha::dbl256($data);
+		};
+
+		return new \Merkle\Tree($hash);
+	}
+
 	public function addBlock(Block $block){
 
 		$this->blocks[] = $block;

@@ -11,12 +11,7 @@ class Data{
 
 	public function __construct(Array $trxs = null){
 
-		$hash = function($data){
-
-			return \Crypt\Common\Sha::dbl256($data);
-		};
-
-		$this->merkleTree = new \Merkle\Tree($hash);
+		$this->merkleTree = Chain::newMerkleTree();
 
 		$this->trxs = [];
 

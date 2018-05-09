@@ -8,10 +8,7 @@ class BlocklyTest extends PHPUnit_Framework_TestCase{
 	public function setUp(){
 
 		$this->chain = new Chain();
-	}
 
-	public function testRun(){
- 
 		$sam = sha1("samweru");
 		$dan = sha1("daniel-bedingfield");
 		$taxman = sha1("revenue-service");
@@ -24,12 +21,18 @@ class BlocklyTest extends PHPUnit_Framework_TestCase{
 		$data->addTrx($tax);
 		 
 		$last_block = $this->chain->getLastBlock();
-		$difficulty = $last_block->getDifficulty();
+
+		// $difficulty = $last_block->getDifficulty();
+		$difficulty = 3;
+
 		$nonce = $last_block->getNonce();
 		 
-		$block = new Block($data, $last_block);
+		$block = new Block($data, $last_block, $difficulty);
 		 
 		$this->chain->addBlock($block);
+	}
+
+	public function testMining(){
 		 
 		//mining
 		foreach($this->chain->getBlocks() as $block){
@@ -53,5 +56,28 @@ class BlocklyTest extends PHPUnit_Framework_TestCase{
 		$this->assertTrue(count($blocks) == 1);
 		$this->assertTrue(!empty($block->getHash()));
 		$this->assertTrue(PoW::validate($block, $last_nonce));
+	}
+
+	public function testMerkleTreeValidation(){
+
+		//validate all blockchain transactions
+		
+		// print_r($this->chain->getArr());
+
+		foreach($this->chain->getBlocks() as $block){
+
+			$merkleTree = Chain::newMerkleTree();
+
+			$data = $block->getData();
+			$arrData = $data->getArr();
+
+			foreach($arrData as $trx)
+				$tree = $merkleTree->add(new Merkle\Leaf($trx));
+
+			$mTree = $data->getMerkleTree();
+			if(!is_null($mTree))
+				$this->assertTrue(key($mTree) == key($tree));
+				// print_r(array($mTree, $tree));
+		}
 	}
 }

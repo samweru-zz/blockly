@@ -7,6 +7,8 @@ use Zend\Http\Client;
 
 require "bootstrap.php";
 
+$difficulty = 3; //three preceding zeros on hash
+
 $cache = new \Doctrine\Common\Cache\ApcuCache();
 
 $chain = new Chain();
@@ -64,7 +66,7 @@ $r->get("/nodes", function() use ($cache){
     return json_encode($cache->fetch("nodes"));
 });
 
-$r->post("/add/trx", function(RequestInterface $req) use ($cache, $chain){
+$r->post("/add/trx", function(RequestInterface $req) use ($cache, $chain, $difficulty){
 
     $body = $req->getParsedBody();
 
@@ -75,7 +77,7 @@ $r->post("/add/trx", function(RequestInterface $req) use ($cache, $chain){
                             sha1($recipient), 
                             $amount));
 
-    $block = new Block($data, $chain->getLastBlock());
+    $block = new Block($data, $chain->getLastBlock(), $difficulty);
 
     $chain->addBlock($block);
 
@@ -133,6 +135,7 @@ $r->get("/consensus", function(RequestInterface $req) use ($cache, $chain){
         $isProofOfWorkValid = true;
         $isOtherChainGreater = false;
 
+        //check length of other chain compare to ours
         if(count($notOurBlocks) > count($ourBlocks)){
 
             $isOtherChainGreater = true;
@@ -148,7 +151,29 @@ $r->get("/consensus", function(RequestInterface $req) use ($cache, $chain){
             }
         }
 
-        if($isProofOfWorkValid && $isOtherChainGreater){
+        $isOtherChainTrxValid = true;
+
+        // validate other chains transactions
+        foreach($notOurBlocks as $block){
+
+            $merkleTree = Chain::newMerkleTree();
+
+            $data = $block->getData();
+            $arrData = $data->getArr();
+
+            foreach($arrData as $trx)
+                $tree = $merkleTree->add(new Merkle\Leaf($trx));
+
+            $mTree = $data->getMerkleTree();
+            if(!is_null($mTree))
+                if(key($mTree)!=key($tree)){
+
+                    $isOtherChainTrxValid = false;
+                    break;
+                }
+        }
+
+        if($isOtherChainTrxValid && $isProofOfWorkValid && $isOtherChainGreater){
 
             $cache->save("chain", $notOurChain->getArr());
             $message = "Our chain has been replaced!";
@@ -157,7 +182,7 @@ $r->get("/consensus", function(RequestInterface $req) use ($cache, $chain){
 
     return $message;
 });
-
+    
 $r->get("/chain", function() use ($chain){
 
     return (string)$chain;
