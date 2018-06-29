@@ -1,6 +1,5 @@
 <?php
 
-//index.php
 use Blockly\{Block, Chain, Trx, Data, PoW};
 use Psr\Http\Message\{RequestInterface, ResponseInterface};
 use Zend\Http\Client;
@@ -18,15 +17,7 @@ if($cache->contains("chain")){
     $chain = new Chain($chainArr);
 }
 
-$allowed = []; //array("user_del");
-
-$r = new Strukt\Router\Router($servReq, $allowed);
-
-$r->before(function(RequestInterface $req, ResponseInterface $res){
-
-    // $path = $req->getUri()->getPath();
-    //
-});
+$r = new Strukt\Router\Router($servReq);
 
 $r->get("/", function(){
 
@@ -35,13 +26,14 @@ $r->get("/", function(){
 
 $r->get("/register/nodes", function(RequestInterface $req) use ($cache){
 
-    $_nodes = [];
-    $body = $req->getParsedBody();
+    $nodesTmp = [];
+    $body = json_decode(str_replace("'", '"', trim((string)$req->getParsedBody())), 1);
+
     if(is_array($body))
         if(!empty($body))
-            $_nodes = $body["nodes"];
+            $nodesTmp = $body["nodes"];
 
-    if(empty($_nodes))
+    if(empty($nodesTmp))
         return "Found no nodes in request!";
 
     $nodes = [];
@@ -49,9 +41,9 @@ $r->get("/register/nodes", function(RequestInterface $req) use ($cache){
         $nodes = $cache->fetch("nodes");
 
     if(!empty($nodes))
-        $nodes = array_diff($nodes, $_nodes);
+        $nodes = array_diff($nodes, $nodesTmp);
 
-    $nodes = array_merge($_nodes, $nodes);
+    $nodes = array_merge($nodesTmp, $nodes);
 
     $cache->save("nodes", $nodes, 21600);
 
@@ -68,9 +60,9 @@ $r->get("/nodes", function() use ($cache){
 
 $r->post("/add/trx", function(RequestInterface $req) use ($cache, $chain, $difficulty){
 
-    $body = $req->getParsedBody();
-
-    extract($body);
+    $sender = $req->getAttribute("sender");
+    $receipient = $req->getAttribute("receipient");
+    $amount = $req->getAttribute("amount");
 
     $data = new Data();
     $data->addTrx(new Trx(sha1($sender), 

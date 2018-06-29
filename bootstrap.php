@@ -19,10 +19,12 @@ $servReq = Zend\Diactoros\ServerRequestFactory::fromGlobals(
     $_FILES
 );
 
-$json = file_get_contents("php://input");
-$body = json_decode(str_replace("'", '"', trim($json)), 1);
+// $json = file_get_contents("php://input");
+// $body = json_decode(str_replace("'", '"', trim($json)), 1);
 
-$servReq = $servReq->withParsedBody($body);
+// $servReq = $servReq->withParsedBody($body);
+
+$servReq = $servReq->withParsedBody(new Zend\Diactoros\PhpInputStream());
 
 //Dependency Injection
 foreach(["NotFound"=>404, 
