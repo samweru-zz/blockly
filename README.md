@@ -30,7 +30,7 @@ php -S localhost:{port} index.php
 2) Add transactions to a node
 
 ```
-http POST localhost:8080/add/trx sender="sam" recipient="max" amount="100"
+http -f POST localhost:8080/add/trx sender="sam" recipient="max" amount="100"
 ```
 
 3) View chain
