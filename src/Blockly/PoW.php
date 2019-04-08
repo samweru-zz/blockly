@@ -30,7 +30,7 @@ class PoW{
 		$nonce = $block->getNonce();
 		$hash = $block->getHash();
 
-		return \Crypt\Common\Sha::dbl256(sprintf("%s%s", $subject, $nonce)) == $hash; 
+		return \Strukt\Hash\Sha::dbl256(sprintf("%s%s", $subject, $nonce)) == $hash; 
 	}
 
 	public function run(){
@@ -48,7 +48,7 @@ class PoW{
 
 		while(true){
 
-			$hash = \Crypt\Common\Sha::dbl256(sprintf("%s%s", $subject, $nonce));
+			$hash = \Strukt\Hash\Sha::dbl256(sprintf("%s%s", $subject, $nonce));
 
 			if(substr($hash, 0, $difficulty) === str_repeat("0", $difficulty))
 				break;

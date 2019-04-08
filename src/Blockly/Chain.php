@@ -29,7 +29,7 @@ class Chain{
 
 		$hash = function($data){
 
-			return \Crypt\Common\Sha::dbl256($data);
+			return \Strukt\Hash\Sha::dbl256($data);
 		};
 
 		return new \Merkle\Tree($hash);

@@ -1,7 +1,8 @@
 <?php
 
 use Blockly\{Block, Chain, Trx, Data, PoW};
-use Psr\Http\Message\{RequestInterface, ResponseInterface};
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Zend\Http\Client;
 
 require "bootstrap.php";
@@ -17,17 +18,17 @@ if($cache->contains("chain")){
     $chain = new Chain($chainArr);
 }
 
-$r = new Strukt\Router\Router($servReq);
+$r = new Strukt\Router\Router($allowed = [], $request);
 
 $r->get("/", function(){
 
     return "Blockly chain.";
 });
 
-$r->get("/register/nodes", function(RequestInterface $req) use ($cache){
+$r->get("/register/nodes", function(Request $req) use ($cache){
 
     $nodesTmp = [];
-    $body = json_decode(str_replace("'", '"', trim((string)$req->getParsedBody())), 1);
+    $body = json_decode(str_replace("'", '"', trim((string)$req->getContent())), 1);
 
     if(is_array($body))
         if(!empty($body))
@@ -58,16 +59,14 @@ $r->get("/nodes", function() use ($cache){
     return json_encode($cache->fetch("nodes"));
 });
 
-$r->post("/add/trx", function(RequestInterface $req) use ($cache, $chain, $difficulty){
+$r->post("/add/trx", function(Request $req) use ($cache, $chain, $difficulty){
 
-    $sender = $req->getAttribute("sender");
-    $receipient = $req->getAttribute("receipient");
-    $amount = $req->getAttribute("amount");
+    $sender = $req->query->get("sender");
+    $recipient = $req->query->get("recipient");
+    $amount = $req->query->get("amount");
 
     $data = new Data();
-    $data->addTrx(new Trx(sha1($sender), 
-                            sha1($recipient), 
-                            $amount));
+    $data->addTrx(new Trx(sha1($sender), sha1($recipient), $amount));
 
     $block = new Block($data, $chain->getLastBlock(), $difficulty);
 
@@ -87,9 +86,9 @@ $r->get("/mine", function() use ($cache, $chain){
     return "Mining successful.";
 });
 
-$r->get("/consensus", function(RequestInterface $req) use ($cache, $chain){
+$r->get("/consensus", function(Request $req) use ($cache, $chain){
 
-    $servParam = $req->getServerParams();
+    $http_post = $req->server->get('HTTP_HOST');
 
     $message = "Our chain rules them all!";
 
@@ -101,7 +100,7 @@ $r->get("/consensus", function(RequestInterface $req) use ($cache, $chain){
 
     foreach($nodes as $node){
 
-        if($node == $servParam["HTTP_HOST"])
+        if($node == $http_post)
             continue;
 
         $client = new Client();

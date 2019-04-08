@@ -17,7 +17,7 @@ class Trx{
 
 	public function getHash(){
 
-		return \Crypt\Common\Sha::dbl256(json_encode($this->getArr()));
+		return \Strukt\Hash\Sha::dbl256(json_encode($this->getArr()));
 	}
 
 	public function getArr(){

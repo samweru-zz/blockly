@@ -1,30 +1,25 @@
 <?php
 
-use Strukt\Core\Registry;
-use Strukt\Event\Event;
-use Strukt\Fs;
-
 $loader = require "vendor/autoload.php";
 $loader->add('Blockly', "src/");
 
-$registry = Registry::getInstance();
-$registry->set("_staticDir", __DIR__."/public/static");
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
-$servReq = Zend\Diactoros\ServerRequestFactory::fromGlobals(
+$request = Request::createFromGlobals();
 
-    $_SERVER,
+$request = new Request(
     $_GET,
     $_POST,
+    array(),
     $_COOKIE,
-    $_FILES
+    $_FILES,
+    $_SERVER
 );
 
-// $json = file_get_contents("php://input");
-// $body = json_decode(str_replace("'", '"', trim($json)), 1);
-
-// $servReq = $servReq->withParsedBody($body);
-
-$servReq = $servReq->withParsedBody(new Zend\Diactoros\PhpInputStream());
+$registry = Strukt\Core\Registry::getInstance();
+$registry->set("_staticDir", __DIR__."/public/static");
+// $registry->set("request", $request);
 
 //Dependency Injection
 foreach(["NotFound"=>404, 
@@ -34,15 +29,18 @@ foreach(["NotFound"=>404,
             "Ok"=>200, 
             "Redirected"=>302,
             "NoContent"=>204] as $msg=>$code)
-    $registry->set(sprintf("Response.%s", $msg), new Event(function() use($code){
+    $registry->set(sprintf("Response.%s", $msg), new Strukt\Event\Event(function() use($code){
 
         $body = "";
         if(in_array($code, array(403,404,405,500)))
-            $body = Fs::cat(sprintf("public/errors/%d.html", $code));
+            $body = Strukt\Fs::cat(sprintf("public/errors/%d.html", $code));
 
-        $res = new Zend\Diactoros\Response();
-        $res = $res->withStatus($code);
-        $res->getBody()->write($body);
+        $res = new Response(
+
+            $body,
+            $code,
+            array('content-type' => 'text/html')
+        );
 
         return $res;
     }));

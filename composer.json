@@ -12,7 +12,7 @@
     	"php": ">=7.0",
         "doctrine/cache": "^1.6",
         "pitsolu/merkle-tree": "dev-master",
-        "pitsolu/crypt": "dev-master",
+        "strukt/crypt": "dev-master",
 		"strukt/router": "dev-master",
         "ext-apcu":"*",
 		"zendframework/zend-http": "^2.7@dev"
