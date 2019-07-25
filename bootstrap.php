@@ -1,46 +1,69 @@
 <?php
 
+use Strukt\Http\Response;
+use Strukt\Http\Request;
+use Strukt\Http\RedirectResponse;
+use Strukt\Http\JsonResponse;
+use Strukt\Http\Session;
+
+use Strukt\Router\Middleware\ExceptionHandler;
+use Strukt\Router\Middleware\Authentication; 
+use Strukt\Router\Middleware\Authorization;
+use Strukt\Router\Middleware\StaticFileFinder;
+use Strukt\Router\Middleware\Session as SessionMiddleware;
+use Strukt\Router\Middleware\Router as RouterMiddleware;
+
+use Strukt\Provider\Router as RouterProvider;
+
+use Strukt\Env;
+
 $loader = require "vendor/autoload.php";
 $loader->add('Blockly', "src/");
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
+Env::set("root_dir", getcwd());
+Env::set("rel_static_dir", "/public/static");
+Env::set("is_dev", true);
 
-$request = Request::createFromGlobals();
+$app = new Strukt\Router\Kernel(Request::createFromGlobals());
+$app->inject("app.dep.author", function(){
 
-$request = new Request(
-    $_GET,
-    $_POST,
-    array(),
-    $_COOKIE,
-    $_FILES,
-    $_SERVER
-);
+    return [];
 
-$registry = Strukt\Core\Registry::getInstance();
-$registry->set("_staticDir", __DIR__."/public/static");
-// $registry->set("request", $request);
+    // return array(
 
-//Dependency Injection
-foreach(["NotFound"=>404, 
-            "MethodNotFound"=>405,
-            "Forbidden"=>403, 
-            "ServerError"=>500,
-            "Ok"=>200, 
-            "Redirected"=>302,
-            "NoContent"=>204] as $msg=>$code)
-    $registry->set(sprintf("Response.%s", $msg), new Strukt\Event\Event(function() use($code){
+    //     "permissions" => array(
 
-        $body = "";
-        if(in_array($code, array(403,404,405,500)))
-            $body = Strukt\Fs::cat(sprintf("public/errors/%d.html", $code));
+    //         // "show_secrets"
+    //     )
+    // );
+});
 
-        $res = new Response(
+$app->inject("app.dep.authentic", function(Session $session){
 
-            $body,
-            $code,
-            array('content-type' => 'text/html')
-        );
+    $user = new Strukt\User();
+    $user->setUsername($session->get("username"));
 
-        return $res;
-    }));
+    return $user;
+});
+
+$app->inject("app.dep.session", function(){
+
+    return new Session;
+});
+
+$app->providers(array(
+
+    RouterProvider::class
+));
+
+$app->middlewares(array(
+
+    ExceptionHandler::class,
+    SessionMiddleware::class,
+    Authorization::class,
+    Authentication::class,
+    StaticFileFinder::class,
+    RouterMiddleware::class
+));
+
+return $app;

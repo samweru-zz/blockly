@@ -1,11 +1,10 @@
 <?php
 
 use Blockly\{Block, Chain, Trx, Data, PoW};
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
+use Strukt\Http\Request;
 use Zend\Http\Client;
 
-require "bootstrap.php";
+$app = require "bootstrap.php";
 
 $difficulty = 3; //three preceding zeros on hash
 
@@ -18,14 +17,12 @@ if($cache->contains("chain")){
     $chain = new Chain($chainArr);
 }
 
-$r = new Strukt\Router\Router($allowed = [], $request);
-
-$r->get("/", function(){
+$app->map("GET", "/", function(){
 
     return "Blockly chain.";
 });
 
-$r->get("/register/nodes", function(Request $req) use ($cache){
+$app->map("GET", "/register/nodes", function(Request $req) use ($cache){
 
     $nodesTmp = [];
     $body = json_decode(str_replace("'", '"', trim((string)$req->getContent())), 1);
@@ -51,7 +48,7 @@ $r->get("/register/nodes", function(Request $req) use ($cache){
     return "Nodes successfully saved";
 });
 
-$r->get("/nodes", function() use ($cache){
+$app->map("GET", "/nodes", function() use ($cache){
 
     if(!$cache->contains("nodes"))
         return "There are no nodes!";
@@ -59,11 +56,11 @@ $r->get("/nodes", function() use ($cache){
     return json_encode($cache->fetch("nodes"));
 });
 
-$r->post("/add/trx", function(Request $req) use ($cache, $chain, $difficulty){
+$app->map("POST","/add/trx", function(Request $req) use ($cache, $chain, $difficulty){
 
-    $sender = $req->query->get("sender");
-    $recipient = $req->query->get("recipient");
-    $amount = $req->query->get("amount");
+    $sender = $req->get("sender");
+    $recipient = $req->get("recipient");
+    $amount = $req->get("amount");
 
     $data = new Data();
     $data->addTrx(new Trx(sha1($sender), sha1($recipient), $amount));
@@ -77,7 +74,7 @@ $r->post("/add/trx", function(Request $req) use ($cache, $chain, $difficulty){
     return "Transaction saved successfully!";
 });
 
-$r->get("/mine", function() use ($cache, $chain){
+$app->map("GET", "/mine", function() use ($cache, $chain){
 
     $chain->mineBlocks();
 
@@ -86,7 +83,7 @@ $r->get("/mine", function() use ($cache, $chain){
     return "Mining successful.";
 });
 
-$r->get("/consensus", function(Request $req) use ($cache, $chain){
+$app->map("GET", "/consensus", function(Request $req) use ($cache, $chain){
 
     $http_post = $req->server->get('HTTP_HOST');
 
@@ -174,9 +171,10 @@ $r->get("/consensus", function(Request $req) use ($cache, $chain){
     return $message;
 });
     
-$r->get("/chain", function() use ($chain){
+$app->map("GET", "/chain", function() use ($chain){
 
     return (string)$chain;
 });
 
-$r->run();
+$response =  $app->run();
+echo $response->getContent();
