@@ -4,3 +4,5 @@ php_errors.log
 test*.php
 composer.lock
 vendor/
+countservealot.php  
+.phpunit.result.cache  

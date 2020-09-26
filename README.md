@@ -51,6 +51,12 @@ http GET localhost:8080/mine
 http GET localhost:8081/register/nodes <<<"{'nodes':['localhost:8080','localhost:8082']}"
 ```
 
+OR
+
+```
+echo {'nodes':['localhost:8080','localhost:8082']} | http GET localhost:8081/register/nodes
+```
+
 6) View registered node
 
 ```

@@ -12,10 +12,11 @@
     	"php": ">=7.0",
         "doctrine/cache": "^1.6",
         "pitsolu/merkle-tree": "dev-master",
-        "strukt/crypt": "dev-master",
+        "strukt/key": "dev-master",
 		"strukt/router": "dev-master",
         "ext-apcu":"*",
-		"zendframework/zend-http": "^2.7@dev"
+		"zendframework/zend-http": "^2.7@dev",
+		"graze/supervisor": "dev-master"
     },
     "minimum-stability":"dev"
 }

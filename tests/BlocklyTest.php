@@ -3,9 +3,9 @@
 use Blockly\{Trx, Block, Data, Chain, PoW};
 use Crypt\Common\Sha;
 
-class BlocklyTest extends PHPUnit_Framework_TestCase{
+class BlocklyTest extends PHPUnit\Framework\TestCase{
 
-	public function setUp(){
+	public function setUp():void{
 
 		$this->chain = new Chain();
 
