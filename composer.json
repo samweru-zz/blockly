@@ -16,7 +16,7 @@
 		"strukt/router": "dev-master",
         "ext-apcu":"*",
 		"zendframework/zend-http": "^2.7@dev",
-		"graze/supervisor": "dev-master"
+		"strukt/process": "dev-master"
     },
     "minimum-stability":"dev"
 }

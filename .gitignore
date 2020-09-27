@@ -6,3 +6,4 @@ composer.lock
 vendor/
 countservealot.php  
 .phpunit.result.cache  
+nohup.out  
