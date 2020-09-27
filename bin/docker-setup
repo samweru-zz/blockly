@@ -1,0 +1,14 @@
+#!/bin/sh
+
+docker build -t alpine:edge
+docker run --name blocky_starter -p 8080:8080 -p 8081:8081 -p 8082:8082 -dit alpine:edge
+docker cp . blockly_starter:/opt
+docker exec -it blocky_starter sh
+
+apk add php php7-session php7-dom git php7-openssl php7-mbstring php7-iconv php7-json php7-phar php7-apcu
+
+wget https://getcomposer.org/composer-stable.phar
+wget https://phar.phpunit.de/phpunit-latest.phar
+
+php composer-stable.phar update
+php phpunit-latest.phar 
