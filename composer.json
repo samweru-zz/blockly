@@ -13,7 +13,7 @@
         "doctrine/cache": "^1.6",
         "pitsolu/merkle-tree": "dev-master",
         "strukt/key": "dev-master",
-		"strukt/router": "dev-master",
+		"strukt/router": "v1.0.0-alpha",
         "ext-apcu":"*",
 		"zendframework/zend-http": "^2.7@dev",
 		"strukt/process": "dev-master"
