@@ -1,4 +1,4 @@
-<phpunit bootstrap="bootstrap.php" backupGlobals="false">
+<phpunit bootstrap="bootstrap-phpunit.php" backupGlobals="false">
   <testsuites>
     <testsuite name="Blockly">
       <directory>./tests</directory>
