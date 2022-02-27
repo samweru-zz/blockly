@@ -5,7 +5,15 @@ This is just a simple blockchain with basic functionality.
 
 ## Installation
 
-Ensure you have `php7` and `php-apcu` extension for cache installed.
+Ensure you have `php7.4` and `php-apcu` extension for cache installed.
+You may find the `apcu` extension via `ppa:ondrej/php`
+
+```
+sudo add-apt-repository ppa:ondrej/php
+sudo apt-get update
+```
+
+Installing `blockly`
 
 ```
 git clone https://github.com/samweru/blockly
