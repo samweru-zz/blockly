@@ -3,8 +3,14 @@
 use Blockly\{Block, Chain, Trx, Data, PoW};
 use Strukt\Http\Request;
 use Zend\Http\Client;
+use Strukt\Env;
 
-$app = require "bootstrap.php";
+$loader = require "vendor/autoload.php";
+$loader->add('Blockly', "src/");
+
+Env::set("root_dir", getcwd());
+Env::set("rel_static_dir", "/public/static");
+Env::set("is_dev", true);
 
 $difficulty = 3; //three preceding zeros on hash
 
@@ -17,12 +23,14 @@ if($cache->contains("chain")){
     $chain = new Chain($chainArr);
 }
 
-$app->map("GET", "/", function(){
+$app = new Strukt\Router\QuickStart();
+
+$app->get("/", function(){
 
     return "Blockly chain.";
 });
 
-$app->map("GET", "/register/nodes", function(Request $req) use ($cache){
+$app->get("/register/nodes", function(Request $req) use ($cache){
 
     $nodesTmp = [];
     $body = json_decode(str_replace("'", '"', trim((string)$req->getContent())), 1);
@@ -48,7 +56,7 @@ $app->map("GET", "/register/nodes", function(Request $req) use ($cache){
     return "Nodes successfully saved";
 });
 
-$app->map("GET", "/nodes", function() use ($cache){
+$app->get("/nodes", function() use ($cache){
 
     if(!$cache->contains("nodes"))
         return "There are no nodes!";
@@ -56,7 +64,7 @@ $app->map("GET", "/nodes", function() use ($cache){
     return json_encode($cache->fetch("nodes"));
 });
 
-$app->map("POST","/add/trx", function(Request $req) use ($cache, $chain, $difficulty){
+$app->post("/add/trx", function(Request $req) use ($cache, $chain, $difficulty){
 
     $sender = $req->get("sender");
     $recipient = $req->get("recipient");
@@ -74,7 +82,7 @@ $app->map("POST","/add/trx", function(Request $req) use ($cache, $chain, $diffic
     return "Transaction saved successfully!";
 });
 
-$app->map("GET", "/mine", function() use ($cache, $chain){
+$app->get("/mine", function() use ($cache, $chain){
 
     $chain->mineBlocks();
 
@@ -83,7 +91,7 @@ $app->map("GET", "/mine", function() use ($cache, $chain){
     return "Mining successful.";
 });
 
-$app->map("GET", "/consensus", function(Request $req) use ($cache, $chain){
+$app->get("/consensus", function(Request $req) use ($cache, $chain){
 
     $http_post = $req->server->get('HTTP_HOST');
 
@@ -171,10 +179,9 @@ $app->map("GET", "/consensus", function(Request $req) use ($cache, $chain){
     return $message;
 });
     
-$app->map("GET", "/chain", function() use ($chain){
+$app->get("/chain", function() use ($chain){
 
     return (string)$chain;
 });
 
-$response =  $app->run();
-echo $response->getContent();
+$app->run();

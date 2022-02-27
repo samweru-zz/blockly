@@ -1,22 +1,25 @@
 {
-	"name": "samweru/blockly",
+    "name": "samweru/blockly",
     "description": "Simple Blockchain",
     "license": "MIT",
     "authors": [
         
         {
-            "name": "Sam Weru"
+            "name": "Sam Weru",
+            "email": "samweru@gmail.com",
+            "homepage": "https://samweru.github.io",
+            "role": "Developer"
         }
     ],
     "require": {
-    	"php": ">=7.0",
+    	"php": ">=7.4",
         "doctrine/cache": "^1.6",
-        "pitsolu/merkle-tree": "dev-master",
-        "strukt/key": "dev-master",
-		"strukt/router": "v1.0.0-alpha",
+        "pitsolu/merkle-tree": "v1.0.0-alpha",
+        "strukt/key": "v1.0.0-alpha",
+	    "strukt/router": "v1.0.1-alpha",
         "ext-apcu":"*",
-		"zendframework/zend-http": "^2.7@dev",
-		"strukt/process": "dev-master"
+	    "zendframework/zend-http": "^2.7@dev",
+        "strukt/process": "v1.0.0-alpha"
     },
     "minimum-stability":"dev"
 }
